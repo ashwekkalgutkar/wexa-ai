@@ -1,69 +1,64 @@
-# Six Degrees — Comprehensive System Audit & QA Report (`AUDIT.md`)
+# System Audit & QA Report (AUDIT.md)
 
-## Phase 1 — Assignment Requirements Audit
+## Requirements Audit Checklist
 
-| Requirement | Status | Location / Implementation Details |
+| Requirement | Status | Implementation Details |
 | :--- | :---: | :--- |
-| **Labeled Nodes & Typed Relationships** | ✅ Done | `backend/src/services/seedService.ts` (`:Artist` nodes with `name`, `genres`, `image_url`, `popularity`; `:COLLABORATED_ON` relationships with `track_title`, `year`, `role`, `image_url`). Matches README diagram. |
-| **Seed Script Runnable with 1 Command** | ✅ Done | `backend/package.json` (`npm run seed` executing `ts-node src/seed.ts`). Uses idempotent openCypher `MERGE` queries to prevent duplicate nodes/edges. |
-| **Multi-Hop Cypher Traversal (`*1..N`)** | ✅ Done | `backend/src/services/graphService.ts` (`getShortestPath` using `shortestPath((a:Artist)-[:COLLABORATED_ON*1..6]-(b:Artist))`). |
-| **Queries Awkward in Relational (SQL)** | ✅ Done | `backend/src/services/graphService.ts` (`getHubArtists` for degree centrality & `getGenreBridges` using `UNWIND` + `collect(DISTINCT connectedGenre)`). |
-| **100% Parameterized Cypher Queries** | ✅ Done | `backend/src/services/graphService.ts` & `seedService.ts`. All Cypher execution uses driver parameters (`$nameA`, `$nameB`, `$limit`, etc.). Template literal interpolation in `getAllPaths` was retrofitted to 100% parameterization. |
-| **End-to-End Usability (Zero-Tech Ready)** | ✅ Done | `frontend/src/App.tsx`. Quiet landing page with instant command palette, step-by-step path reveal (`SequentialPathView.tsx`), interactive 1-hop exploration (`ExploreGraphView.tsx`), and visual fallback initials. |
-| **Loading, Empty, & Error States** | ✅ Done | `frontend/src/components/ErrorState.tsx`, `ErrorBoundary.tsx`, glass loading skeletons, and fallback initial avatars. Manually verified under offline DB simulation. |
-| **CognoDB Environment Variables Only** | ✅ Done | `backend/src/config/db.ts` reads `process.env.COGNODB_URI`, `COGNODB_USER`, `COGNODB_PASSWORD`. Zero hardcoded passwords in application logic. |
-| **`.env` Gitignored & Dev Files Purged** | ✅ Done | `.env` present in `.gitignore`. Dev helper scripts (`fetch_itunes_covers.ts`, `new_collabs.ts`, `check_urls.ts`, `.env.example`) purged for production deployment. |
-| **Graceful Database Fallback** | ✅ Done | `backend/src/services/graphService.ts`. If CognoDB is unreachable, backend seamlessly defaults to the offline fallback seed engine (`SEED_ARTISTS`, `SEED_COLLABORATIONS`) without hanging or crashing. |
-| **Documentation & Deliverables** | ✅ Done | Comprehensive `README.md` containing SQL-vs-Graph breakdown, data model diagram, CognoDB setup guide, Cypher query documentation, and UI state descriptions. |
+| **Labeled Nodes & Typed Relationships** | Complete | `backend/src/services/seedService.ts` (`:Artist` nodes with properties; `:COLLABORATED_ON` relationships with track properties). |
+| **Seed Script Single Execution** | Complete | `backend/package.json` (`npm run seed`). Uses openCypher `MERGE` queries to prevent node/edge duplication. |
+| **Multi-Hop Cypher Traversal** | Complete | `backend/src/services/graphService.ts` (`getShortestPath` using `shortestPath((a:Artist)-[:COLLABORATED_ON*1..6]-(b:Artist))`). |
+| **Relational-Awkward Queries** | Complete | `backend/src/services/graphService.ts` (`getHubArtists` for degree centrality & `getGenreBridges` for cross-genre graph traversals). |
+| **Parameterized Cypher Queries** | Complete | `backend/src/services/graphService.ts` & `seedService.ts`. All Cypher statements execute via driver parameters. |
+| **End-to-End UI Flow** | Complete | `frontend/src/App.tsx`. Command palette search, sequential path reveal, and 1-hop interactive graph exploration. |
+| **State Handling** | Complete | Loading skeletons, error panels (`ErrorState.tsx`), and visual fallbacks for offline DB states. |
+| **Environment Variable Security** | Complete | Credentials loaded strictly via `process.env.COGNODB_URI`, `COGNODB_USER`, `COGNODB_PASSWORD`. `.env` is gitignored. |
+| **Graceful Database Fallback** | Complete | `backend/src/services/graphService.ts`. Unreachable database triggers offline dataset fallback without runtime failure. |
+| **Documentation** | Complete | `README.md` documents architecture, schema design, Cypher queries, and execution instructions. |
 
 ---
 
-## Phase 2 — Functional Test Pass & Bug Log
+## Test Log & Bug Fix Summary
 
-### Core Interaction Test Cases Verified
-1. **Real Path Traversal (Kanye West → Daft Punk)**: Returns 2-hop collaboration path (`Kanye West` → `Synthesizer / Production` → `Daft Punk`) complete with verified iTunes artwork and track release year metadata (`2013`).
-2. **Disconnected / Unseeded Artist Pair**: Triggers clean 404 response with user-friendly `ErrorState` notification and a "Try Other Artists" action button without infinite spinners.
-3. **Non-Existent Artist Search**: Zod schema and query service catch invalid input cleanly and present autocomplete fallbacks.
-4. **Hub Node High-Degree Exploration**: `ExploreGraphView.tsx` caps visible neighbors to 16 with a clean `+N more` badge to preserve canvas animation performance.
-5. **Low-Degree Node Exploration (1-2 collaborators)**: Canvas force layout adapts dynamically using radial initial positioning without breaking node geometry.
-6. **Database Connection Interruption**: Disconnecting `COGNODB_URI` gracefully activates backend fallback dataset. DB status indicator turns grey, and UI continues serving graph queries offline seamlessly.
-7. **Seed Script Idempotency**: Executed `npm run seed` twice consecutively. verified exact count persistence: `53 Artists, 69 Collaborations` with zero duplicated nodes or relationships.
+### Core Scenarios Tested
+1. **Valid Path Traversal**: Returns 2-hop collaboration path between seeded artists with release metadata.
+2. **Unconnected Pair**: Returns HTTP 404 with structured error response and retry controls.
+3. **High-Degree Hub View**: `ExploreGraphView.tsx` caps visible neighbors to 16 to maintain canvas rendering performance.
+4. **Offline Resilience**: Simulating database disconnect triggers offline seed fallback while maintaining application availability.
+5. **Idempotency**: Repeat execution of `npm run seed` retains accurate node count without duplicate entries.
 
-### Automated Test Suite Execution
-- **Backend Unit & Integration Tests**: Implemented using Jest and Supertest (`backend/tests/unit/graphService.test.ts` & `backend/tests/integration/api.test.ts`).
-  - **Result**: `12 / 12 PASSED` (100% pass rate).
-- **Frontend Component Tests**: Implemented using Vitest and Testing Library (`frontend/src/tests/components.test.tsx`).
-  - **Result**: `3 / 3 PASSED` (100% pass rate).
+### Automated Test Results
+- **Backend Test Suite (Jest & Supertest)**: 12 / 12 passed.
+- **Frontend Test Suite (Vitest & Testing Library)**: 3 / 3 passed.
 
-### Bugs Found & Fixed Log
+### Bug Fixes Implemented
 
-| # | Bug Identified | Root Cause | Fix Applied |
+| # | Issue Identified | Cause | Resolution |
 | :-: | :--- | :--- | :--- |
-| **1** | Cypher string interpolation in `getAllPaths` | Template literal `${Math.min(maxHops, 5)}` used in Cypher match string | Refactored `getAllPaths` Cypher query to fixed `*1..5` openCypher traversal with 100% driver parameters (`$nameA`, `$nameB`). |
-| **2** | Unvalidated API Query Inputs | Query parameters (`artistA`, `artistB`) passed directly to service layer | Integrated **Zod** schema validation middleware on `/api/path`, `/api/paths/all`, `/api/artist/:name` routes returning clean HTTP 400 validation error objects. |
-| **3** | Silent Startup Environment Failures | Missing CognoDB credentials fell back to localhost quietly | Added `validateEnv()` in `db.ts` to inspect `COGNODB_URI`, `COGNODB_USER`, `COGNODB_PASSWORD` on server startup and emit structured log diagnostics. |
-| **4** | Global Express Error Unhandled Crashes | Route errors relied on scattered try/catch blocks | Created centralized Express error handling middleware in `server.ts` to capture unhandled backend exceptions cleanly. |
-| **5** | Uncaught D3/Canvas Rendering Errors | Canvas calculation failures could blank the entire single-page React app | Created React `ErrorBoundary` component around `ExploreGraphView` and `SequentialPathView` to display localized recovery UI if rendering fails. |
-| **6** | Uncached API Server Requests | Components made raw `useEffect` fetches on every render cycle | Integrated **TanStack Query (React Query)** with dedicated custom hooks (`useGraphQueries.ts`) for query caching, background refetching, and clean server state management. |
+| **1** | String interpolation in Cypher query | Dynamic hop limit inside Cypher string in `getAllPaths` | Converted to fixed `*1..5` openCypher traversal with parameter passing. |
+| **2** | Unvalidated API endpoints | Route parameters passed directly to query service | Applied Zod schemas on `/api/path`, `/api/paths/all`, `/api/artist/:name`. |
+| **3** | Unchecked environment variables | Missing credentials caused silent fallback | Added `validateEnv()` in `db.ts` to log missing environment configuration on startup. |
+| **4** | Unhandled Express errors | Scattered try/catch blocks in route handlers | Added global Express error handling middleware in `server.ts`. |
+| **5** | Visual canvas exceptions | Viewport calculation failures in D3 force graph | Wrapped graph visualization views in React `ErrorBoundary` component. |
+| **6** | Uncached API requests | Component render cycles triggering raw fetches | Integrated TanStack Query (`useGraphQueries.ts`) for query caching and server-state management. |
 
 ---
 
-## Phase 3 — Engineering Decisions & Architectural Rationale
+## Technical Architecture Overview
 
-### 1. TanStack Query (React Query) for Server State Management
-> *"We chose TanStack Query over raw `useEffect` fetches because graph queries (shortest path traversals, neighborhood expansions) are inherently server-state operations that benefit heavily from caching, automatic deduplication, and declarative loading/error states. By wrapping our API layer in custom hooks (`useShortestPath`, `useArtistNeighborhood`, `useHubArtists`), we eliminate race conditions, avoid redundant network requests when switching back and forth between paths, and keep our React presentation components entirely unburdened by fetch mechanics."*
+### 1. TanStack Query Server State Caching
+TanStack Query manages server-side graph queries, eliminating redundant network calls and race conditions during component re-renders.
 
-### 2. Strict Separation of Server State vs. UI State
-> *"We strictly separated server state (managed by React Query) from ephemeral local UI state (managed by React component hooks). Local state handles interactive concerns—such as command palette visibility, active hover nodes on the canvas, and modal toggle flags—while server state handles entity data returned from CognoDB. This prevents state contamination and keeps our application predictable and easy to debug."*
+### 2. UI and Server State Isolation
+Server graph data is managed via React Query hooks. Local component state handles ephemeral view logic such as modal visibility and node hovers.
 
-### 3. Single Shared Neo4j Driver Instance (Singleton Pattern)
-> *"Instantiating a Neo4j driver is an expensive operation that establishes a connection pool to CognoDB. Re-creating the driver on every HTTP request leads to connection exhaustion, elevated latency, and socket leaks. We implemented a singleton driver factory in `backend/src/config/db.ts` created once at server startup, maintaining a tuned connection pool (`maxConnectionPoolSize: 50`) reused across all API route handlers."*
+### 3. Singleton Database Driver Instance
+The Neo4j driver connection pool is initialized once on server start in `backend/src/config/db.ts` (`maxConnectionPoolSize: 50`) and shared across API routes.
 
-### 4. 100% Parameterized Cypher Queries & SQL Injection Safety
-> *"All Cypher queries in our graph service go through the Neo4j driver using parameterized execution (`session.run(query, { nameA, nameB })`). We eliminated all template string interpolations from Cypher statements. This guarantees openCypher query plan caching in CognoDB for optimal performance and completely immune to Cypher injection attacks."*
+### 4. Parameterized Query Execution
+Driver parameterization guarantees query plan reuse in CognoDB and prevents Cypher injection vulnerabilities.
 
-### 5. Idempotent Graph Seeding via openCypher `MERGE`
-> *"Our seed pipeline (`seedService.ts`) is designed to be fully idempotent. Instead of naive `CREATE` queries that duplicate nodes and relationships on subsequent runs, we utilize openCypher `MERGE` patterns with `ON CREATE SET` and `ON MATCH SET`. This ensures that running `npm run seed` multiple times maintains identical data integrity without duplicating entity graphs."*
+### 5. Idempotent MERGE Data Ingestion
+Data seeding uses openCypher `MERGE` statements to support repeatable runs without creating duplicate graph structures.
 
-### 6. Component-Level Error Isolation (React Error Boundaries)
-> *"HTML5 Canvas force simulations involve dynamic Math calculations that can occasionally throw rendering exceptions under edge-case viewports. To prevent a canvas exception from crashing the entire application, we wrapped our visualization views in a custom React `ErrorBoundary`. If a canvas error occurs, the user sees a localized recovery panel with a 'Reset Component' button while the rest of the application remains fully functional."*
+### 6. React Error Boundaries
+React `ErrorBoundary` wrappers prevent rendering failures in the canvas layer from breaking the broader application layout.
