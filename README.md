@@ -161,16 +161,13 @@ LIMIT 8
 3. Save your connection details (`COGNODB_URI`, `COGNODB_USER`, `COGNODB_PASSWORD`).
 
 ### Step 2: Configure Environment Variables
-Copy `.env.example` to `.env` in the root directory:
-```bash
-cp .env.example .env
-```
-Edit `.env` with your CognoDB credentials:
+Create `.env` in the root directory:
 ```env
-COGNODB_URI=bolt://your-cognodb-host:7687
-COGNODB_USER=neo4j
+COGNODB_URI=bolt+s://db-3bd9e34f.databases.cognodb.com
+COGNODB_USER=cognodb
 COGNODB_PASSWORD=your_password_here
 PORT=5000
+NODE_ENV=production
 ```
 
 ### Step 3: Install Dependencies
@@ -231,7 +228,6 @@ six-degrees-wexa/
 │   │   └── App.tsx                   # Main React application
 │   ├── package.json
 │   └── vite.config.ts
-├── .env.example
 ├── .gitignore
 ├── package.json                      # Root workspace & dev runner
 └── README.md

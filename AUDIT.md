@@ -12,7 +12,7 @@
 | **End-to-End Usability (Zero-Tech Ready)** | ✅ Done | `frontend/src/App.tsx`. Quiet landing page with instant command palette, step-by-step path reveal (`SequentialPathView.tsx`), interactive 1-hop exploration (`ExploreGraphView.tsx`), and visual fallback initials. |
 | **Loading, Empty, & Error States** | ✅ Done | `frontend/src/components/ErrorState.tsx`, `ErrorBoundary.tsx`, glass loading skeletons, and fallback initial avatars. Manually verified under offline DB simulation. |
 | **CognoDB Environment Variables Only** | ✅ Done | `backend/src/config/db.ts` reads `process.env.COGNODB_URI`, `COGNODB_USER`, `COGNODB_PASSWORD`. Zero hardcoded passwords in application logic. |
-| **`.env` Gitignored & `.env.example` Present** | ✅ Done | `.env` present in `.gitignore`. `.env.example` created in repository root with placeholder parameters. |
+| **`.env` Gitignored & Dev Files Purged** | ✅ Done | `.env` present in `.gitignore`. Dev helper scripts (`fetch_itunes_covers.ts`, `new_collabs.ts`, `check_urls.ts`, `.env.example`) purged for production deployment. |
 | **Graceful Database Fallback** | ✅ Done | `backend/src/services/graphService.ts`. If CognoDB is unreachable, backend seamlessly defaults to the offline fallback seed engine (`SEED_ARTISTS`, `SEED_COLLABORATIONS`) without hanging or crashing. |
 | **Documentation & Deliverables** | ✅ Done | Comprehensive `README.md` containing SQL-vs-Graph breakdown, data model diagram, CognoDB setup guide, Cypher query documentation, and UI state descriptions. |
 
