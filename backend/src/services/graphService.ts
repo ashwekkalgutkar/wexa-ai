@@ -552,8 +552,8 @@ function getOfflineHubs(limit: number): GraphNode[] {
     ...a,
     degree: counts.get(a.name) || 0
   }))
-  .sort((a, b) => (b.degree || 0) - (a.degree || 0))
-  .slice(0, limit);
+    .sort((a, b) => (b.degree || 0) - (a.degree || 0))
+    .slice(0, limit);
 }
 
 function getOfflineGenreBridges(limit: number): GenreBridgeResult[] {
@@ -561,11 +561,11 @@ function getOfflineGenreBridges(limit: number): GenreBridgeResult[] {
   for (const c of SEED_COLLABORATIONS) {
     const artistAObj = SEED_ARTISTS.find(a => a.name === c.from);
     const artistBObj = SEED_ARTISTS.find(a => a.name === c.to);
-    
+
     if (artistAObj && artistBObj) {
       if (!bridgeMap.has(artistAObj.name)) bridgeMap.set(artistAObj.name, new Set());
       if (!bridgeMap.has(artistBObj.name)) bridgeMap.set(artistBObj.name, new Set());
-      
+
       artistBObj.genres.forEach(g => bridgeMap.get(artistAObj.name)!.add(g));
       artistAObj.genres.forEach(g => bridgeMap.get(artistBObj.name)!.add(g));
     }
