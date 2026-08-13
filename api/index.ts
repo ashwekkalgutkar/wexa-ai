@@ -1,6 +1,10 @@
 import express from 'express';
 import cors from 'cors';
 import apiRoutes from '../backend/src/routes/api';
+import { testConnection } from '../backend/src/config/db';
+
+// Pre-warm CognoDB connection asynchronously on cold start
+testConnection().catch(() => {});
 
 const app = express();
 

@@ -19,22 +19,26 @@ export function validateEnv(): { valid: boolean; missing: string[] } {
   return { valid: missing.length === 0, missing };
 }
 
-const uri = process.env.COGNODB_URI || 'bolt://localhost:7687';
-const user = process.env.COGNODB_USER || 'neo4j';
-const password = process.env.COGNODB_PASSWORD || 'password';
-
 let driver: Driver | null = null;
 let connectionTested = false;
 let isConnected = false;
 let connectionError: string | null = null;
 
+export function getDbCredentials() {
+  const uri = process.env.COGNODB_URI || 'bolt://localhost:7687';
+  const user = process.env.COGNODB_USER || 'neo4j';
+  const password = process.env.COGNODB_PASSWORD || 'password';
+  return { uri, user, password };
+}
+
 export function getDriver(): Driver {
   if (!driver) {
     validateEnv();
+    const { uri, user, password } = getDbCredentials();
     console.log(`[CognoDB] Initializing Neo4j driver connection to: ${uri}`);
     driver = neo4j.driver(uri, neo4j.auth.basic(user, password), {
-      maxConnectionPoolSize: 50,
-      connectionTimeout: 10000,
+      maxConnectionPoolSize: 20,
+      connectionTimeout: 8000,
     });
   }
   return driver;
@@ -46,6 +50,7 @@ export function getSession(): Session {
 }
 
 export async function testConnection(): Promise<{ connected: boolean; error?: string; uri: string }> {
+  const { uri } = getDbCredentials();
   try {
     const d = getDriver();
     const serverInfo = await d.getServerInfo();
@@ -64,6 +69,11 @@ export async function testConnection(): Promise<{ connected: boolean; error?: st
 }
 
 export function getDBStatus() {
+  const { uri } = getDbCredentials();
+  if (!connectionTested && process.env.COGNODB_URI) {
+    // Fire background connection check if not tested yet
+    testConnection().catch(() => {});
+  }
   return {
     tested: connectionTested,
     connected: isConnected,
