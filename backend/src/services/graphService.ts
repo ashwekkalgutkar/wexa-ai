@@ -1,3 +1,4 @@
+import { Session } from 'neo4j-driver';
 import { getSession, getDBStatus } from '../config/db';
 import { SEED_ARTISTS, SEED_COLLABORATIONS } from './seedData';
 
@@ -331,7 +332,7 @@ export async function getHubArtists(limit: number = 10): Promise<GraphNode[]> {
       { limit: neo4jInteger(limit) }
     );
 
-    return result.records.map((rec) => ({
+    return result.records.map((rec: any) => ({
       id: rec.get('id') || rec.get('name'),
       name: rec.get('name'),
       genres: rec.get('genres') || [],
@@ -383,7 +384,7 @@ export async function getGenreBridges(limit: number = 8): Promise<GenreBridgeRes
       { limit: neo4jInteger(limit) }
     );
 
-    return result.records.map((rec) => ({
+    return result.records.map((rec: any) => ({
       artist: {
         id: rec.get('id') || rec.get('name'),
         name: rec.get('name'),
@@ -431,7 +432,7 @@ export async function searchArtists(query: string, limit: number = 10): Promise<
       { query, limit: neo4jInteger(limit) }
     );
 
-    return result.records.map(rec => ({
+    return result.records.map((rec: any) => ({
       id: rec.get('id') || rec.get('name'),
       name: rec.get('name'),
       genres: rec.get('genres') || [],
