@@ -2,7 +2,7 @@ import React, { useRef, useCallback, useEffect } from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
 import { forceCollide } from 'd3-force';
 import { NodeData, LinkData, PathResult } from '../types/graph';
-import { ACCENT_COLOR, DEFAULT_LINK_COLOR, DEFAULT_NODE_RING } from '../utils/colors';
+import { ACCENT_COLOR, DEFAULT_LINK_COLOR, hexToRgba, darkenHex } from '../utils/colors';
 import { getArtistAvatarData } from '../utils/avatar';
 
 interface GraphCanvasProps {
@@ -39,6 +39,19 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
   useEffect(() => { activePathRef.current = activePath; }, [activePath]);
   useEffect(() => { linksRef.current = links; }, [links]);
   useEffect(() => { nodesRef.current = nodes; }, [nodes]);
+
+  // Continuous animation loop for breathing nodes & energy pulses
+  useEffect(() => {
+    let animId: number;
+    const animate = () => {
+      if (fgRef.current) {
+        fgRef.current.refresh();
+      }
+      animId = requestAnimationFrame(animate);
+    };
+    animId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animId);
+  }, []);
 
   // Configure D3 Force Physics
   useEffect(() => {
@@ -100,7 +113,7 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
     }
   }, [selectedArtist, nodes]);
 
-  // Handle Node Hover — write to refs, then immediately repaint
+  // Handle Node Hover
   const handleNodeHover = useCallback((node: NodeData | null) => {
     hoverNodeRef.current = node;
     if (node) {
@@ -118,9 +131,13 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
     fgRef.current?.refresh();
   }, []);
 
-  // Custom Node Canvas Renderer — renders artist images inside canvas nodes
+  // Custom Node Renderer — Cognodb-style volumetric radial halo glow & 3D orb spheres
   const drawNode = useCallback(
     (node: NodeData, ctx: CanvasRenderingContext2D, globalScale: number) => {
+      const time = Date.now() / 1000;
+      const nodeSeed = (node.name ? node.name.charCodeAt(0) : 0) + (node.degree || 1);
+      const pulse = Math.sin(time * 2.2 + nodeSeed) * 0.12 + 1.0; // Smooth breathing pulse
+
       const hoverNode = hoverNodeRef.current;
       const hoverNeighbors = hoverNeighborsRef.current;
       const pathNodeNames = pathNodeNamesRef.current;
@@ -135,29 +152,54 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
       const hasActiveContext = hoverNode !== null || activePath !== null || selectedArtist !== null;
       const isFocused = isPathNode || isHovered || isNeighbor || isSelected;
 
-      const baseRadius = Math.max(16, Math.min(24, 16 + (node.degree || 2) * 1.2));
-      const r = isFocused ? baseRadius * 1.15 : baseRadius;
+      const baseRadius = Math.max(14, Math.min(22, 14 + (node.degree || 2) * 1.1));
+      const r = (isFocused ? baseRadius * 1.25 : baseRadius) * pulse;
+
+      const x = node.x || 0;
+      const y = node.y || 0;
 
       const avatar = getArtistAvatarData(node.name);
+      const coreColor = isFocused ? ACCENT_COLOR : (avatar.color1 || '#00F2FE');
+      const outerGlowColor = isFocused ? ACCENT_COLOR : (avatar.color2 || '#4FACFE');
 
       ctx.save();
 
-      // Unfocused nodes recede when context is active
-      ctx.globalAlpha = hasActiveContext && !isFocused ? 0.12 : 1.0;
+      // Unfocused nodes recede smoothly
+      ctx.globalAlpha = hasActiveContext && !isFocused ? 0.15 : 1.0;
 
-      // Glow for focused nodes
-      if (isFocused) {
-        ctx.shadowColor = ACCENT_COLOR;
-        ctx.shadowBlur = 14 * (globalScale / 2);
-      }
+      // 1. VOLUMETRIC RADIAL HALO GLOW (Cognodb Style Multi-layer Aura)
+      const glowRadius = r * (isFocused ? 4.5 : 3.2) * pulse;
+      const glowGrad = ctx.createRadialGradient(x, y, r * 0.15, x, y, glowRadius);
+      glowGrad.addColorStop(0, hexToRgba(coreColor, isFocused ? 0.70 : 0.45));
+      glowGrad.addColorStop(0.3, hexToRgba(outerGlowColor, isFocused ? 0.40 : 0.22));
+      glowGrad.addColorStop(0.65, hexToRgba(outerGlowColor, isFocused ? 0.15 : 0.06));
+      glowGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
-      // 1. Outer ring border
       ctx.beginPath();
-      ctx.arc(node.x || 0, node.y || 0, r + 2, 0, 2 * Math.PI, false);
-      ctx.fillStyle = isFocused ? ACCENT_COLOR : DEFAULT_NODE_RING;
+      ctx.arc(x, y, glowRadius, 0, 2 * Math.PI, false);
+      ctx.fillStyle = glowGrad;
       ctx.fill();
 
-      // 2. Load & Cache Artist Photo
+      // 2. GLOSSY 3D SPHERICAL ORB CORE
+      const orbGrad = ctx.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.1, x, y, r);
+      orbGrad.addColorStop(0, '#FFFFFF'); // Specular highlight
+      orbGrad.addColorStop(0.2, coreColor);
+      orbGrad.addColorStop(0.8, outerGlowColor);
+      orbGrad.addColorStop(1, darkenHex(outerGlowColor, 40));
+
+      // Outer Ring Rim
+      ctx.beginPath();
+      ctx.arc(x, y, r + 1.5, 0, 2 * Math.PI, false);
+      ctx.fillStyle = isFocused ? '#FFFFFF' : hexToRgba(coreColor, 0.85);
+      ctx.fill();
+
+      // Orb Core Body
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, 2 * Math.PI, false);
+      ctx.fillStyle = orbGrad;
+      ctx.fill();
+
+      // 3. ARTIST AVATAR / INITIALS INSIDE ORB CORE
       let imageObj: HTMLImageElement | null = null;
       if (node.image_url) {
         if (!imageMapRef.current.has(node.image_url)) {
@@ -174,73 +216,79 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
         }
       }
 
-      // 3. Render Node Avatar (Artist Image or Fallback Gradient + Initials)
-      ctx.beginPath();
-      ctx.arc(node.x || 0, node.y || 0, r, 0, 2 * Math.PI, false);
-
       if (imageObj) {
         ctx.save();
+        ctx.beginPath();
+        ctx.arc(x, y, r * 0.85, 0, 2 * Math.PI, false);
         ctx.clip();
-        ctx.drawImage(imageObj, (node.x || 0) - r, (node.y || 0) - r, r * 2, r * 2);
+        ctx.drawImage(imageObj, x - r * 0.85, y - r * 0.85, r * 1.7, r * 1.7);
+
+        // Glass Sheen Overlay
+        const sheenGrad = ctx.createLinearGradient(x - r, y - r, x + r, y + r);
+        sheenGrad.addColorStop(0, 'rgba(255, 255, 255, 0.45)');
+        sheenGrad.addColorStop(0.4, 'rgba(255, 255, 255, 0.05)');
+        sheenGrad.addColorStop(1, 'rgba(0, 0, 0, 0.35)');
+        ctx.fillStyle = sheenGrad;
+        ctx.fillRect(x - r, y - r, r * 2, r * 2);
         ctx.restore();
       } else {
-        const gradient = ctx.createLinearGradient(
-          (node.x || 0) - r,
-          (node.y || 0) - r,
-          (node.x || 0) + r,
-          (node.y || 0) + r
-        );
-        gradient.addColorStop(0, avatar.color1);
-        gradient.addColorStop(1, avatar.color2);
-        ctx.fillStyle = gradient;
-        ctx.fill();
-
-        const initialsFontSize = Math.max(r * 0.75, 8);
-        ctx.font = `700 ${initialsFontSize}px Outfit, Inter, sans-serif`;
+        const initialsFontSize = Math.max(r * 0.65, 8);
+        ctx.font = `800 ${initialsFontSize}px Inter, Outfit, sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillStyle = avatar.textColor;
-        ctx.fillText(avatar.initials, node.x || 0, (node.y || 0) + 1);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.shadowColor = 'rgba(0,0,0,0.6)';
+        ctx.shadowBlur = 4;
+        ctx.fillText(avatar.initials, x, y + 1);
       }
 
-      // 4. Label: only on hover/focus/path/selection
-      if (isFocused) {
-        const fontSize = Math.max(12 / globalScale, 5);
-        ctx.font = `700 ${fontSize}px Outfit, Inter, sans-serif`;
+      // Specular Top-Left Lens Highlight Dot
+      ctx.beginPath();
+      ctx.arc(x - r * 0.32, y - r * 0.32, r * 0.22, 0, 2 * Math.PI, false);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.70)';
+      ctx.fill();
+
+      // 4. COGNODB MONOSPACE DARK GLASS PILL LABELS (:ArtistName)
+      if (isFocused || globalScale > 1.25) {
+        const fontSize = Math.max(12 / globalScale, 6);
+        ctx.font = `600 ${fontSize}px "JetBrains Mono", "Fira Code", Monaco, monospace`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
-        const textWidth = ctx.measureText(node.name).width;
-        const textY = (node.y || 0) + r + fontSize * 1.1;
+        const labelText = `: ${node.name}`;
+        const textWidth = ctx.measureText(labelText).width;
+        const textY = y + r + glowRadius * 0.3 + fontSize;
 
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
-        ctx.shadowBlur = 6;
         ctx.beginPath();
         ctx.roundRect(
-          (node.x || 0) - textWidth / 2 - 6,
-          textY - fontSize / 2 - 3,
-          textWidth + 12,
-          fontSize + 6,
+          x - textWidth / 2 - 8,
+          textY - fontSize / 2 - 4,
+          textWidth + 16,
+          fontSize + 8,
           6
         );
+        ctx.fillStyle = isFocused ? 'rgba(15, 23, 42, 0.92)' : 'rgba(15, 23, 42, 0.75)';
         ctx.fill();
+        ctx.strokeStyle = isFocused ? hexToRgba(ACCENT_COLOR, 0.8) : 'rgba(255, 255, 255, 0.15)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
 
-        ctx.fillStyle = '#1A1A1A';
-        ctx.fillText(node.name, node.x || 0, textY);
+        ctx.fillStyle = isFocused ? '#38BDF8' : '#F1F5F9';
+        ctx.fillText(labelText, x, textY);
       }
 
       ctx.restore();
     },
-    [] // Empty deps — reads live values from refs
+    []
   );
 
-  // Custom Edge Canvas Renderer — reads from refs
+  // Custom Edge Canvas Renderer with Energy Flow Particles
   const drawLink = useCallback(
     (link: LinkData, ctx: CanvasRenderingContext2D, globalScale: number) => {
       const hoverNode = hoverNodeRef.current;
       const pathLinkKeys = pathLinkKeysRef.current;
       const activePath = activePathRef.current;
+      const time = Date.now() / 1000;
 
       let sourceNode: NodeData | undefined;
       let targetNode: NodeData | undefined;
@@ -267,6 +315,11 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
       const isHoverEdge = hoverNode && (hoverNode.name === sourceName || hoverNode.name === targetName);
       const hasActiveContext = hoverNode !== null || activePath !== null;
 
+      const sx = sourceNode.x;
+      const sy = sourceNode.y || 0;
+      const tx = targetNode.x;
+      const ty = targetNode.y || 0;
+
       ctx.save();
 
       if (isPathEdge) {
@@ -274,11 +327,13 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
         ctx.lineWidth = 3.5 / globalScale;
         ctx.strokeStyle = ACCENT_COLOR;
         ctx.shadowColor = ACCENT_COLOR;
-        ctx.shadowBlur = 10;
+        ctx.shadowBlur = 12;
       } else if (isHoverEdge) {
-        ctx.globalAlpha = 0.8;
-        ctx.lineWidth = 2.0 / globalScale;
+        ctx.globalAlpha = 0.85;
+        ctx.lineWidth = 2.2 / globalScale;
         ctx.strokeStyle = ACCENT_COLOR;
+        ctx.shadowColor = ACCENT_COLOR;
+        ctx.shadowBlur = 8;
       } else if (hasActiveContext) {
         ctx.globalAlpha = 0.05;
         ctx.lineWidth = 1.0 / globalScale;
@@ -289,14 +344,30 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
         ctx.strokeStyle = DEFAULT_LINK_COLOR;
       }
 
+      // Draw base edge line
       ctx.beginPath();
-      ctx.moveTo(sourceNode.x, sourceNode.y || 0);
-      ctx.lineTo(targetNode.x, targetNode.y || 0);
+      ctx.moveTo(sx, sy);
+      ctx.lineTo(tx, ty);
       ctx.stroke();
+
+      // Energy Pulse Particles along path/hover edges
+      if (isPathEdge || isHoverEdge) {
+        const linkSeed = (sourceName.charCodeAt(0) + targetName.charCodeAt(0)) % 10;
+        const progress = ((time * 0.8 + linkSeed * 0.1) % 1);
+        const px = sx + (tx - sx) * progress;
+        const py = sy + (ty - sy) * progress;
+
+        ctx.beginPath();
+        ctx.arc(px, py, 3.5 / globalScale, 0, 2 * Math.PI, false);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.shadowColor = ACCENT_COLOR;
+        ctx.shadowBlur = 10;
+        ctx.fill();
+      }
 
       ctx.restore();
     },
-    [] // Empty deps — reads live values from refs
+    []
   );
 
   const drawNodePointerArea = useCallback(
@@ -304,7 +375,7 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
       const baseRadius = Math.max(16, Math.min(24, 16 + (node.degree || 2) * 1.2));
       ctx.fillStyle = color;
       ctx.beginPath();
-      ctx.arc(node.x || 0, node.y || 0, baseRadius + 6, 0, 2 * Math.PI, false);
+      ctx.arc(node.x || 0, node.y || 0, baseRadius + 14, 0, 2 * Math.PI, false);
       ctx.fill();
     },
     []

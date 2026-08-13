@@ -26,3 +26,32 @@ export function getRoleBadgeColor(role: string): string {
       return 'bg-slate-100 text-slate-700 border-slate-200';
   }
 }
+
+export function hexToRgba(hex: string, alpha: number = 1): string {
+  if (!hex || typeof hex !== 'string') return `rgba(108, 92, 231, ${alpha})`;
+  let cleanHex = hex.replace('#', '');
+  if (cleanHex.length === 3) {
+    cleanHex = cleanHex.split('').map(c => c + c).join('');
+  }
+  const num = parseInt(cleanHex, 16);
+  if (isNaN(num)) return `rgba(108, 92, 231, ${alpha})`;
+  const r = (num >> 16) & 255;
+  const g = (num >> 8) & 255;
+  const b = num & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+export function darkenHex(hex: string, percent: number = 20): string {
+  if (!hex || typeof hex !== 'string') return '#1e1b4b';
+  let cleanHex = hex.replace('#', '');
+  if (cleanHex.length === 3) {
+    cleanHex = cleanHex.split('').map(c => c + c).join('');
+  }
+  const num = parseInt(cleanHex, 16);
+  if (isNaN(num)) return '#1e1b4b';
+  const amt = Math.round(2.55 * percent);
+  const R = Math.max(0, (num >> 16) - amt);
+  const G = Math.max(0, ((num >> 8) & 0x00FF) - amt);
+  const B = Math.max(0, (num & 0x0000FF) - amt);
+  return '#' + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
+}
