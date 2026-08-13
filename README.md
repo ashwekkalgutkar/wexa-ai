@@ -5,33 +5,43 @@
 [![Vercel Deployment](https://img.shields.io/badge/Vercel-Deployed-success?style=for-the-badge&logo=vercel)](https://wexa-ai-q8d8.vercel.app/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![CognoDB](https://img.shields.io/badge/CognoDB-openCypher-cyan?style=for-the-badge)](https://cognodb.com/)
-[![Watch Demo Video](https://img.shields.io/badge/🎬_Watch_Demo_Video-Google_Drive-red?style=for-the-badge&logo=google-drive)](https://drive.google.com/file/d/1oyYKbIhcxUlkTW_Xk6U_m2Hhh4F9bi3D/view?usp=sharing)
 
 ---
 
 ## 🔗 Quick Links
 - 🚀 **Live Production App**: [https://wexa-ai-q8d8.vercel.app/](https://wexa-ai-q8d8.vercel.app/)
 - 📡 **Backend API Status**: [https://wexa-ai-q8d8.vercel.app/api/status](https://wexa-ai-q8d8.vercel.app/api/status)
-- 🎬 **Walkthrough Video**: [Google Drive Video Demo](https://drive.google.com/file/d/1oyYKbIhcxUlkTW_Xk6U_m2Hhh4F9bi3D/view?usp=sharing)
 
 ---
 
-## 📸 Application Screenshots
+## 🎬 Project Walkthrough Video
 
-### 1. Landing & Graph Search Hero
+<video src="docs/videos/demo.mp4" controls width="100%"></video>
+
+*If the video player above does not load directly, you can also view or download the walkthrough video here:*  
+👉 [Watch Demo Video (Google Drive)](https://drive.google.com/file/d/1oyYKbIhcxUlkTW_Xk6U_m2Hhh4F9bi3D/view?usp=sharing)
+
+---
+
+## 📸 Application Screenshots Showcase
+
+### 1. Landing & Graph Search Hero View
 ![Landing & Graph Search Hero](docs/screenshots/01-hero-landing.png)
 
-### 2. Find Collaboration Chain Dialog (Cypher Search)
+### 2. Find Collaboration Chain Dialog (openCypher Search)
 ![Find Collaboration Chain Dialog](docs/screenshots/02-find-path-modal.png)
 
-### 3. Sequential 4-Degree Shortest Path Traversal (BTS → Snoop Dogg)
-![Sequential Shortest Path Traversal](docs/screenshots/03-shortest-path-traversal.png)
+### 3. Shortest Path Traversal View (Kanye West → Daft Punk)
+![Shortest Path Traversal](docs/screenshots/03-shortest-path-traversal.png)
 
-### 4. 1-Hop Neighborhood Exploration View (Coldplay Node Circle)
+### 4. 1-Hop Neighborhood Exploration (Kanye West Focus Circle)
 ![1-Hop Neighborhood Exploration View](docs/screenshots/04-neighborhood-exploration.png)
 
-### 5. Degree Centrality Hub Artists Ranking
+### 5. Degree Centrality Hub Artists Modal
 ![Degree Centrality Hub Artists Ranking](docs/screenshots/05-hub-artists.png)
+
+### 6. Cross-Genre Bridge Artists Modal
+![Cross-Genre Bridge Artists](docs/screenshots/06-genre-bridges.png)
 
 ---
 
