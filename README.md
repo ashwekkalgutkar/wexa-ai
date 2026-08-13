@@ -1,6 +1,6 @@
 # Six Degrees — Music Artist Collaboration Graph
 
-> A deterministic, high-performance graph application powered by CognoDB (openCypher over Bolt) and the official Neo4j driver.
+> A deterministic, high-performance graph application powered by CognoDB (openCypher over Bolt) and Neo4j driver.
 
 ---
 
