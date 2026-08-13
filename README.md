@@ -209,23 +209,5 @@ Visualization views are wrapped in React `ErrorBoundary` components to handle ca
 
 ---
 
-## Test Suite
-
-### Backend Unit & Integration Tests (Jest & Supertest)
-```bash
-cd backend
-npm test
-```
-Runs 12 test cases covering parameterized Cypher queries, offline fallbacks, Zod input validation, and HTTP API endpoints.
-
-### Frontend Component Tests (Vitest & Testing Library)
-```bash
-cd frontend
-npm test
-```
-Runs 3 component test cases covering ErrorState, Navbar status indicators, and ErrorBoundary error catching.
-
----
-
 ## License
 MIT License.
