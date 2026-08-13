@@ -151,34 +151,32 @@ export const ExploreGraphView: React.FC<ExploreGraphViewProps> = ({
         ctx.fillText(avatar.initials, node.x || 0, (node.y || 0) + 1);
       }
 
-      // 4. Selective Labels: Center node ALWAYS shown, neighbor labels ONLY shown on hover!
-      if (isCenter || isHovered) {
-        const fontSize = Math.max(12 / globalScale, 6);
-        ctx.font = `700 ${fontSize}px Outfit, Inter, sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
+      // 4. Node Labels: Render artist name under every node in 1-hop explore view
+      const fontSize = Math.max(12 / globalScale, 6);
+      ctx.font = `700 ${fontSize}px Outfit, Inter, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
 
-        const textWidth = ctx.measureText(node.name).width;
-        const textY = (node.y || 0) + r + fontSize * 1.1;
+      const textWidth = ctx.measureText(node.name).width;
+      const textY = (node.y || 0) + r + fontSize * 1.1;
 
-        // White glass pill background for label
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
-        ctx.shadowBlur = 6;
-        ctx.beginPath();
-        ctx.roundRect(
-          (node.x || 0) - textWidth / 2 - 6,
-          textY - fontSize / 2 - 3,
-          textWidth + 12,
-          fontSize + 6,
-          6
-        );
-        ctx.fill();
+      // Glass pill background for label
+      ctx.fillStyle = isFocused ? 'rgba(108, 92, 231, 0.95)' : 'rgba(255, 255, 255, 0.92)';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+      ctx.shadowBlur = 6;
+      ctx.beginPath();
+      ctx.roundRect(
+        (node.x || 0) - textWidth / 2 - 6,
+        textY - fontSize / 2 - 3,
+        textWidth + 12,
+        fontSize + 6,
+        6
+      );
+      ctx.fill();
 
-        // Text label
-        ctx.fillStyle = '#1A1A1A';
-        ctx.fillText(node.name, node.x || 0, textY);
-      }
+      // Text label
+      ctx.fillStyle = isFocused ? '#FFFFFF' : '#1A1A1A';
+      ctx.fillText(node.name, node.x || 0, textY);
 
       ctx.restore();
     },
@@ -213,6 +211,18 @@ export const ExploreGraphView: React.FC<ExploreGraphViewProps> = ({
       ctx.restore();
     },
     [displayNodes, hoverNode]
+  );
+
+  // Hit area detection for cursor hover & click events over canvas nodes
+  const drawNodePointerArea = useCallback(
+    (node: NodeData, color: string, ctx: CanvasRenderingContext2D) => {
+      const r = node.name === centerArtist.name ? 30 : 26;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(node.x || 0, node.y || 0, r + 4, 0, 2 * Math.PI, false);
+      ctx.fill();
+    },
+    [centerArtist.name]
   );
 
   return (
@@ -265,6 +275,7 @@ export const ExploreGraphView: React.FC<ExploreGraphViewProps> = ({
           nodeId="name"
           nodeLabel={() => ''}
           nodeCanvasObject={drawNode}
+          nodePointerAreaPaint={drawNodePointerArea}
           linkCanvasObject={drawLink}
           onNodeClick={(node) => onSelectArtist(node as NodeData)}
           onNodeHover={(node) => {

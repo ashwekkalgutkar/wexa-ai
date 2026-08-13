@@ -299,6 +299,17 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
     [] // Empty deps — reads live values from refs
   );
 
+  const drawNodePointerArea = useCallback(
+    (node: NodeData, color: string, ctx: CanvasRenderingContext2D) => {
+      const baseRadius = Math.max(16, Math.min(24, 16 + (node.degree || 2) * 1.2));
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(node.x || 0, node.y || 0, baseRadius + 6, 0, 2 * Math.PI, false);
+      ctx.fill();
+    },
+    []
+  );
+
   return (
     <div className="w-full h-screen bg-[#FAFAF8] relative">
       <ForceGraph2D
@@ -307,6 +318,7 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
         nodeId="name"
         nodeLabel={() => ''}
         nodeCanvasObject={drawNode}
+        nodePointerAreaPaint={drawNodePointerArea}
         linkCanvasObject={drawLink}
         onNodeClick={(node) => onNodeClick(node as NodeData)}
         onNodeHover={(node) => handleNodeHover(node as NodeData | null)}

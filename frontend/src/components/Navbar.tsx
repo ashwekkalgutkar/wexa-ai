@@ -1,6 +1,7 @@
 import React from 'react';
-import { Network, Flame, GitMerge, Search } from 'lucide-react';
+import { Flame, GitMerge, Search } from 'lucide-react';
 import { DBStatus } from '../types/graph';
+import { Logo } from './Logo';
 
 interface NavbarProps {
   appMode?: 'landing' | 'path' | 'explore';
@@ -22,16 +23,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="fixed top-0 left-0 right-0 z-40 px-6 py-4 flex items-center justify-between pointer-events-none">
       {/* Left: Branding */}
-      <div className="flex items-center gap-3 pointer-events-auto">
-        <div className="w-10 h-10 rounded-2xl bg-white shadow-sm border border-slate-200/80 flex items-center justify-center">
-          <Network className="w-5 h-5 text-[#6C5CE7]" />
-        </div>
-        <div>
-          <h1 className="font-extrabold text-lg tracking-tight text-[#1A1A1A] font-display">
-            Six Degrees
-          </h1>
-          <p className="text-xs text-slate-500 font-sans">Music Collaboration Network</p>
-        </div>
+      <div className="pointer-events-auto">
+        <Logo size="md" />
       </div>
 
       {/* Center: Command Bar Trigger */}
