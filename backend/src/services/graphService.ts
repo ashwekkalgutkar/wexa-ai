@@ -35,13 +35,14 @@ export interface GenreBridgeResult {
  * 1. Get entire Graph (or up to limit) for full network rendering
  */
 export async function getFullGraph(limit: number = 200): Promise<{ nodes: GraphNode[]; links: GraphEdge[] }> {
-  const status = getDBStatus();
-  if (!status.connected) {
-    return getOfflineGraph();
-  }
-
-  const session = getSession();
+  let session: Session | null = null;
   try {
+    const status = getDBStatus();
+    if (!status.connected) {
+      return getOfflineGraph();
+    }
+
+    session = getSession();
     const result = await session.run(
       `
       MATCH (a:Artist)-[r:COLLABORATED_ON]-(b:Artist)
@@ -102,7 +103,9 @@ export async function getFullGraph(limit: number = 200): Promise<{ nodes: GraphN
     console.error('[Cypher Error] getFullGraph failed, falling back to cached seed dataset:', err);
     return getOfflineGraph();
   } finally {
-    await session.close();
+    if (session) {
+      try { await session.close(); } catch (_) {}
+    }
   }
 }
 
@@ -110,13 +113,14 @@ export async function getFullGraph(limit: number = 200): Promise<{ nodes: GraphN
  * 2. Get 1-hop neighborhood for a single artist
  */
 export async function getArtistNeighborhood(artistName: string): Promise<{ artist: GraphNode; neighbors: GraphNode[]; links: GraphEdge[] }> {
-  const status = getDBStatus();
-  if (!status.connected) {
-    return getOfflineArtistNeighborhood(artistName);
-  }
-
-  const session = getSession();
+  let session: Session | null = null;
   try {
+    const status = getDBStatus();
+    if (!status.connected) {
+      return getOfflineArtistNeighborhood(artistName);
+    }
+
+    session = getSession();
     const result = await session.run(
       `
       MATCH (a:Artist)-[r:COLLABORATED_ON]-(other:Artist)
@@ -170,11 +174,13 @@ export async function getArtistNeighborhood(artistName: string): Promise<{ artis
 
     return { artist: artistNode, neighbors: Array.from(neighborsMap.values()), links };
   } catch (err: any) {
-    if (err.message.includes('not found')) throw err;
+    if (err.message && err.message.includes('not found')) throw err;
     console.error(`[Cypher Error] getArtistNeighborhood for ${artistName} failed:`, err);
     return getOfflineArtistNeighborhood(artistName);
   } finally {
-    await session.close();
+    if (session) {
+      try { await session.close(); } catch (_) {}
+    }
   }
 }
 
@@ -182,13 +188,14 @@ export async function getArtistNeighborhood(artistName: string): Promise<{ artis
  * 3. Shortest Collaboration Path (Cypher shortestPath)
  */
 export async function getShortestPath(artistA: string, artistB: string): Promise<ShortestPathResult> {
-  const status = getDBStatus();
-  if (!status.connected) {
-    return getOfflineShortestPath(artistA, artistB);
-  }
-
-  const session = getSession();
+  let session: Session | null = null;
   try {
+    const status = getDBStatus();
+    if (!status.connected) {
+      return getOfflineShortestPath(artistA, artistB);
+    }
+
+    session = getSession();
     const result = await session.run(
       `
       MATCH p = shortestPath((a:Artist)-[:COLLABORATED_ON*1..6]-(b:Artist))
@@ -225,11 +232,13 @@ export async function getShortestPath(artistA: string, artistB: string): Promise
 
     return { chain, links, length: links.length };
   } catch (err: any) {
-    if (err.message.includes('No collaboration path') || err.message.includes('not found')) throw err;
+    if (err.message && (err.message.includes('No collaboration path') || err.message.includes('not found'))) throw err;
     console.error(`[Cypher Error] getShortestPath between ${artistA} and ${artistB} failed:`, err);
     return getOfflineShortestPath(artistA, artistB);
   } finally {
-    await session.close();
+    if (session) {
+      try { await session.close(); } catch (_) {}
+    }
   }
 }
 
@@ -237,14 +246,15 @@ export async function getShortestPath(artistA: string, artistB: string): Promise
  * 4. Alternate paths query (all paths up to 4 hops)
  */
 export async function getAllPaths(artistA: string, artistB: string, maxHops: number = 4): Promise<ShortestPathResult[]> {
-  const status = getDBStatus();
-  if (!status.connected) {
-    const shortest = await getOfflineShortestPath(artistA, artistB);
-    return [shortest];
-  }
-
-  const session = getSession();
+  let session: Session | null = null;
   try {
+    const status = getDBStatus();
+    if (!status.connected) {
+      const shortest = await getOfflineShortestPath(artistA, artistB);
+      return [shortest];
+    }
+
+    session = getSession();
     const cypher = `
       MATCH p = (a:Artist)-[:COLLABORATED_ON*1..5]-(b:Artist)
       WHERE toLower(a.name) = toLower($nameA) AND toLower(b.name) = toLower($nameB)
@@ -291,7 +301,9 @@ export async function getAllPaths(artistA: string, artistB: string, maxHops: num
     console.error('[Cypher Error] getAllPaths failed:', err);
     return [];
   } finally {
-    await session.close();
+    if (session) {
+      try { await session.close(); } catch (_) {}
+    }
   }
 }
 
@@ -299,13 +311,14 @@ export async function getAllPaths(artistA: string, artistB: string, maxHops: num
  * 5. Most-connected Hub Artists (Degree Centrality)
  */
 export async function getHubArtists(limit: number = 10): Promise<GraphNode[]> {
-  const status = getDBStatus();
-  if (!status.connected) {
-    return getOfflineHubs(limit);
-  }
-
-  const session = getSession();
+  let session: Session | null = null;
   try {
+    const status = getDBStatus();
+    if (!status.connected) {
+      return getOfflineHubs(limit);
+    }
+
+    session = getSession();
     const result = await session.run(
       `
       MATCH (a:Artist)-[:COLLABORATED_ON]-(other:Artist)
@@ -330,7 +343,9 @@ export async function getHubArtists(limit: number = 10): Promise<GraphNode[]> {
     console.error('[Cypher Error] getHubArtists failed:', err);
     return getOfflineHubs(limit);
   } finally {
-    await session.close();
+    if (session) {
+      try { await session.close(); } catch (_) {}
+    }
   }
 }
 
@@ -338,13 +353,14 @@ export async function getHubArtists(limit: number = 10): Promise<GraphNode[]> {
  * 6. Genre Bridge Query (Artists spanning distinct genres)
  */
 export async function getGenreBridges(limit: number = 8): Promise<GenreBridgeResult[]> {
-  const status = getDBStatus();
-  if (!status.connected) {
-    return getOfflineGenreBridges(limit);
-  }
-
-  const session = getSession();
+  let session: Session | null = null;
   try {
+    const status = getDBStatus();
+    if (!status.connected) {
+      return getOfflineGenreBridges(limit);
+    }
+
+    session = getSession();
     const result = await session.run(
       `
       MATCH (a:Artist)-[:COLLABORATED_ON]-(b:Artist)
@@ -382,7 +398,9 @@ export async function getGenreBridges(limit: number = 8): Promise<GenreBridgeRes
     console.error('[Cypher Error] getGenreBridges failed:', err);
     return getOfflineGenreBridges(limit);
   } finally {
-    await session.close();
+    if (session) {
+      try { await session.close(); } catch (_) {}
+    }
   }
 }
 
@@ -390,16 +408,17 @@ export async function getGenreBridges(limit: number = 8): Promise<GenreBridgeRes
  * Search Artists for autocomplete
  */
 export async function searchArtists(query: string, limit: number = 10): Promise<GraphNode[]> {
-  const status = getDBStatus();
-  if (!status.connected) {
-    const q = query.toLowerCase();
-    return SEED_ARTISTS
-      .filter(a => a.name.toLowerCase().includes(q) || a.genres.some(g => g.toLowerCase().includes(q)))
-      .slice(0, limit);
-  }
-
-  const session = getSession();
+  let session: Session | null = null;
   try {
+    const status = getDBStatus();
+    if (!status.connected) {
+      const q = query.toLowerCase();
+      return SEED_ARTISTS
+        .filter(a => a.name.toLowerCase().includes(q) || a.genres.some(g => g.toLowerCase().includes(q)))
+        .slice(0, limit);
+    }
+
+    session = getSession();
     const result = await session.run(
       `
       MATCH (a:Artist)
@@ -424,7 +443,9 @@ export async function searchArtists(query: string, limit: number = 10): Promise<
     const q = query.toLowerCase();
     return SEED_ARTISTS.filter(a => a.name.toLowerCase().includes(q)).slice(0, limit);
   } finally {
-    await session.close();
+    if (session) {
+      try { await session.close(); } catch (_) {}
+    }
   }
 }
 
