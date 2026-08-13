@@ -16,26 +16,28 @@
 
 ## 🎬 Project Walkthrough Video
 
-<video src="docs/videos/demo.mp4" controls width="100%"></video>
+[![Watch Demo Video](https://img.shields.io/badge/🎬_Watch_Walkthrough_Video-Google_Drive-red?style=for-the-badge&logo=google-drive)](https://drive.google.com/file/d/1oyYKbIhcxUlkTW_Xk6U_m2Hhh4F9bi3D/view?usp=sharing)
+
+👉 **[Click Here to Watch Demo Video on Google Drive](https://drive.google.com/file/d/1oyYKbIhcxUlkTW_Xk6U_m2Hhh4F9bi3D/view?usp=sharing)**
 
 ---
 
-## 📸 Application Screenshots
+## 📸 Application Screenshots Showcase
 
-### 1. Home
-![Home](docs/screenshots/ss1-home.png)
+### 1. Home Page & Interactive Graph Hero
+![Home](docs/screenshots/home.png)
 
-### 2. Modal to Select Artist
-![Modal to Select Artist](docs/screenshots/ss2-select-artist-modal.png)
+### 2. Modal to Select Artists (Cypher Shortest Path)
+![Modal to Select Artist](docs/screenshots/select-artist.png)
 
-### 3. Connections Showing with Hops and Artist
-![Connections Showing with Hops and Artist](docs/screenshots/ss3-connections-showing-hops.png)
+### 3. Collaboration Connections & Hops Traversal
+![Connections Showing with Hops and Artist](docs/screenshots/connection-sepereation.png)
 
-### 4. Collaborations of a Single Artist
-![Collaborations of a Single Artist](docs/screenshots/ss4-collabs-single-artist.png)
+### 4. Single Artist Collaborations (1-Hop Focus Circle)
+![Collaborations of a Single Artist](docs/screenshots/single-artist-collab.png)
 
-### 5. Hubs
-![Hubs](docs/screenshots/ss5-hubs.png)
+### 5. Most-Connected Hub Artists Ranking
+![Hubs](docs/screenshots/hubs.png)
 
 ---
 
