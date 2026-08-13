@@ -2,7 +2,15 @@
 
 > A deterministic, high-performance graph application powered by CognoDB (openCypher over Bolt) and Neo4j driver.
 
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Deployed-success?style=for-the-badge&logo=vercel)](https://wexa-ai-q8d8.vercel.app/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![CognoDB](https://img.shields.io/badge/CognoDB-openCypher-cyan?style=for-the-badge)](https://cognodb.com/)
+
 ---
+
+## 🔗 Live Deployment
+- **Live Production App**: [https://wexa-ai-q8d8.vercel.app/](https://wexa-ai-q8d8.vercel.app/)
+- **Backend API Status**: [https://wexa-ai-q8d8.vercel.app/api/status](https://wexa-ai-q8d8.vercel.app/api/status)
 
 ## Concept & Use Case
 
