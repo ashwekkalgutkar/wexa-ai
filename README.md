@@ -8,21 +8,19 @@
 
 ---
 
-## 🔗 Quick Links
-- 🚀 **Live Production App**: [https://wexa-ai-q8d8.vercel.app/](https://wexa-ai-q8d8.vercel.app/)
-- 📡 **Backend API Status**: [https://wexa-ai-q8d8.vercel.app/api/status](https://wexa-ai-q8d8.vercel.app/api/status)
+## Quick Links
+- **Live Production App**: [https://wexa-ai-q8d8.vercel.app/](https://wexa-ai-q8d8.vercel.app/)
+- **Backend API Status**: [https://wexa-ai-q8d8.vercel.app/api/status](https://wexa-ai-q8d8.vercel.app/api/status)
 
 ---
 
-## 🎬 Project Walkthrough Video
+## Project Walkthrough Video
 
-[![Watch Demo Video](https://img.shields.io/badge/🎬_Watch_Walkthrough_Video-Google_Drive-red?style=for-the-badge&logo=google-drive)](https://drive.google.com/file/d/1oyYKbIhcxUlkTW_Xk6U_m2Hhh4F9bi3D/view?usp=sharing)
-
-👉 **[Click Here to Watch Demo Video on Google Drive](https://drive.google.com/file/d/1oyYKbIhcxUlkTW_Xk6U_m2Hhh4F9bi3D/view?usp=sharing)**
+- **Video Walkthrough (Google Drive)**: [Watch Demo Video](https://drive.google.com/file/d/1oyYKbIhcxUlkTW_Xk6U_m2Hhh4F9bi3D/view?usp=sharing)
 
 ---
 
-## 📸 Application Screenshots Showcase
+## Application Screenshots Showcase
 
 ### 1. Home Page & Interactive Graph Hero
 ![Home](docs/screenshots/home.png)
