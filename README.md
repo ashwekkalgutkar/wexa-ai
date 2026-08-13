@@ -22,20 +22,20 @@
 
 ## 📸 Application Screenshots
 
-### 1. Home View
-![Home View](docs/screenshots/01-home.png)
+### 1. Home
+![Home](docs/screenshots/ss1-home.png)
 
 ### 2. Modal to Select Artist
-![Modal to Select Artist](docs/screenshots/02-modal-select-artist.png)
+![Modal to Select Artist](docs/screenshots/ss2-select-artist-modal.png)
 
-### 3. Connections Showing Hops and Artist
-![Connections Showing Hops and Artist](docs/screenshots/03-connections-hops.png)
+### 3. Connections Showing with Hops and Artist
+![Connections Showing with Hops and Artist](docs/screenshots/ss3-connections-showing-hops.png)
 
-### 4. Collaborations of Single Artist
-![Collaborations of Single Artist](docs/screenshots/04-artist-collabs.png)
+### 4. Collaborations of a Single Artist
+![Collaborations of a Single Artist](docs/screenshots/ss4-collabs-single-artist.png)
 
-### 5. Hub Artists
-![Hub Artists](docs/screenshots/05-hubs.png)
+### 5. Hubs
+![Hubs](docs/screenshots/ss5-hubs.png)
 
 ---
 
