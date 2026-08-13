@@ -5,12 +5,35 @@
 [![Vercel Deployment](https://img.shields.io/badge/Vercel-Deployed-success?style=for-the-badge&logo=vercel)](https://wexa-ai-q8d8.vercel.app/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![CognoDB](https://img.shields.io/badge/CognoDB-openCypher-cyan?style=for-the-badge)](https://cognodb.com/)
+[![Watch Demo Video](https://img.shields.io/badge/🎬_Watch_Demo_Video-Google_Drive-red?style=for-the-badge&logo=google-drive)](https://drive.google.com/file/d/1oyYKbIhcxUlkTW_Xk6U_m2Hhh4F9bi3D/view?usp=sharing)
 
 ---
 
-## 🔗 Live Deployment
-- **Live Production App**: [https://wexa-ai-q8d8.vercel.app/](https://wexa-ai-q8d8.vercel.app/)
-- **Backend API Status**: [https://wexa-ai-q8d8.vercel.app/api/status](https://wexa-ai-q8d8.vercel.app/api/status)
+## 🔗 Quick Links
+- 🚀 **Live Production App**: [https://wexa-ai-q8d8.vercel.app/](https://wexa-ai-q8d8.vercel.app/)
+- 📡 **Backend API Status**: [https://wexa-ai-q8d8.vercel.app/api/status](https://wexa-ai-q8d8.vercel.app/api/status)
+- 🎬 **Walkthrough Video**: [Google Drive Video Demo](https://drive.google.com/file/d/1oyYKbIhcxUlkTW_Xk6U_m2Hhh4F9bi3D/view?usp=sharing)
+
+---
+
+## 📸 Application Screenshots
+
+### 1. Landing & Graph Search Hero
+![Landing & Graph Search Hero](docs/screenshots/01-hero-landing.png)
+
+### 2. Find Collaboration Chain Dialog (Cypher Search)
+![Find Collaboration Chain Dialog](docs/screenshots/02-find-path-modal.png)
+
+### 3. Sequential 4-Degree Shortest Path Traversal (BTS → Snoop Dogg)
+![Sequential Shortest Path Traversal](docs/screenshots/03-shortest-path-traversal.png)
+
+### 4. 1-Hop Neighborhood Exploration View (Coldplay Node Circle)
+![1-Hop Neighborhood Exploration View](docs/screenshots/04-neighborhood-exploration.png)
+
+### 5. Degree Centrality Hub Artists Ranking
+![Degree Centrality Hub Artists Ranking](docs/screenshots/05-hub-artists.png)
+
+---
 
 ## Concept & Use Case
 
@@ -18,7 +41,7 @@
 
 ### Key Capabilities
 - **6-Degrees Shortest Path Discovery**: Compute the shortest collaboration chain between any two artists in real time.
-- **Interactive Force-Directed Network**: Full-bleed 2D graph with dynamic physics, genre color-coding, and focus lighting.
+- **Interactive Force-Directed Network**: Full-bleed 2D graph with dynamic physics, genre color-coding, volumetric glowing nodes, and focus lighting.
 - **1-Hop Neighborhood Exploration**: Click any artist node to inspect degree centrality, popularity metrics, and direct collaborators.
 - **Degree Centrality Hubs**: Rank the most-connected "hub" artists sitting at the center of the music industry.
 - **Cross-Genre Bridges**: Discover artists sitting structurally between distinct genre clusters.
