@@ -18,30 +18,24 @@
 
 <video src="docs/videos/demo.mp4" controls width="100%"></video>
 
-*If the video player above does not load directly, you can also view or download the walkthrough video here:*  
-👉 [Watch Demo Video (Google Drive)](https://drive.google.com/file/d/1oyYKbIhcxUlkTW_Xk6U_m2Hhh4F9bi3D/view?usp=sharing)
-
 ---
 
-## 📸 Application Screenshots Showcase
+## 📸 Application Screenshots
 
-### 1. Landing & Graph Search Hero View
-![Landing & Graph Search Hero](docs/screenshots/01-hero-landing.png)
+### 1. Home View
+![Home View](docs/screenshots/01-home.png)
 
-### 2. Find Collaboration Chain Dialog (openCypher Search)
-![Find Collaboration Chain Dialog](docs/screenshots/02-find-path-modal.png)
+### 2. Modal to Select Artist
+![Modal to Select Artist](docs/screenshots/02-modal-select-artist.png)
 
-### 3. Shortest Path Traversal View (Kanye West → Daft Punk)
-![Shortest Path Traversal](docs/screenshots/03-shortest-path-traversal.png)
+### 3. Connections Showing Hops and Artist
+![Connections Showing Hops and Artist](docs/screenshots/03-connections-hops.png)
 
-### 4. 1-Hop Neighborhood Exploration (Kanye West Focus Circle)
-![1-Hop Neighborhood Exploration View](docs/screenshots/04-neighborhood-exploration.png)
+### 4. Collaborations of Single Artist
+![Collaborations of Single Artist](docs/screenshots/04-artist-collabs.png)
 
-### 5. Degree Centrality Hub Artists Modal
-![Degree Centrality Hub Artists Ranking](docs/screenshots/05-hub-artists.png)
-
-### 6. Cross-Genre Bridge Artists Modal
-![Cross-Genre Bridge Artists](docs/screenshots/06-genre-bridges.png)
+### 5. Hub Artists
+![Hub Artists](docs/screenshots/05-hubs.png)
 
 ---
 
